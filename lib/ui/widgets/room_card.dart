@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'info_row.dart';
 class RoomCard extends StatefulWidget {
   final String roomNumber;
   final String tenantName;
@@ -118,9 +118,9 @@ class _RoomCardState extends State<RoomCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Divider(),
-          _buildInfoRow('Contract:', widget.contractDuration),
-          _buildInfoRow('Plan:', widget.contractPlan),
-          _buildInfoRow('', 'Expires: ${widget.expiryDate}'),
+           InfoRow(label: 'Contract:', value: widget.contractDuration),
+           InfoRow(label: 'Plan:', value: widget.contractPlan),
+           InfoRow(label: 'Expires:', value: widget.expiryDate),
           const SizedBox(height: 12),
           const Text(
             'TENANT DETAILS',
@@ -179,31 +179,7 @@ class _RoomCardState extends State<RoomCard> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        children: [
-          if (label.isNotEmpty)
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
-            ),
-          if (label.isNotEmpty) const SizedBox(width: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildServiceChip(String service) {
     IconData icon = Icons.wifi;
