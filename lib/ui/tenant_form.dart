@@ -153,7 +153,7 @@ class _TenantFormState extends State<TenantForm> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                     const Text(
                       'Notes',
                       style: TextStyle(
                         fontSize: 12,
@@ -164,15 +164,15 @@ class _TenantFormState extends State<TenantForm> {
                     const SizedBox(height: 8),
                     CustomTextField(
                       controller: _notesController,
-                      hint: 'Text',
-                      icon: Icons.note_outlined,
-                      maxLines: 3,
+                      hint: 'Notes',
+                      maxLines: 4,
                     ),
+                    
                     const SizedBox(height: 30),
                     CustomButton(
                       text: 'Save',
                       onPressed: () {
-                        // Handle save action
+                        // Handle save action here but not implemented yet
                       },
                     ),
                   ],
