@@ -7,8 +7,7 @@ class Room {
   final String roomId;
   final String roomNumber;
   Status status;
-  final DateTime? leaseStartDate;
-  final DateTime? leaseEndDate;
+  final double rentFee; 
   final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -17,8 +16,7 @@ class Room {
     String? roomId,
     required this.roomNumber,
     required this.status,
-    this.leaseStartDate,
-    this.leaseEndDate,
+    required this.rentFee,
     this.notes,
     required this.createdAt,
     required this.updatedAt,
@@ -29,8 +27,7 @@ class Room {
       'roomId': roomId,
       'roomNumber': roomNumber,
       'status': status.name,
-      'leaseStartDate': leaseStartDate?.toIso8601String(),
-      'leaseEndDate': leaseEndDate?.toIso8601String(),
+      'rentFee': rentFee,
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -45,12 +42,7 @@ class Room {
         (e) => e.name == map['status'],
         orElse: () => Status.active,
       ),
-      leaseStartDate: map['leaseStartDate'] != null
-          ? DateTime.parse(map['leaseStartDate'])
-          : null,
-      leaseEndDate: map['leaseEndDate'] != null
-          ? DateTime.parse(map['leaseEndDate'])
-          : null,
+      rentFee: (map['rentFee'] as num).toDouble(),
       notes: map['notes'],
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
@@ -61,6 +53,7 @@ class Room {
     String? roomId,
     String? roomNumber,
     Status? status,
+    double? rentFee,
     DateTime? leaseStartDate,
     DateTime? leaseEndDate,
     String? notes,
@@ -71,8 +64,7 @@ class Room {
       roomId: roomId ?? this.roomId,
       roomNumber: roomNumber ?? this.roomNumber,
       status: status ?? this.status,
-      leaseStartDate: leaseStartDate ?? this.leaseStartDate,
-      leaseEndDate: leaseEndDate ?? this.leaseEndDate,
+      rentFee: rentFee ?? this.rentFee,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

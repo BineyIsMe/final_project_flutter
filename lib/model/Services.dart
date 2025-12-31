@@ -1,73 +1,56 @@
+import 'package:myapp/model/enum.dart';
 import 'package:uuid/uuid.dart';
-
-class Services {
-  static final uuid = Uuid();
+class RoomService {
+  static final _uuid = Uuid();
 
   final String serviceId;
   final String roomId;
-  final bool electricity;
-  final bool water;
-  final bool rubbish;
-  final bool laundry;
-  final bool wifi;
+  final ServiceType serviceType;
   final DateTime updatedAt;
+  final DateTime timestamp;
 
-  Services({
+  RoomService({
     String? serviceId,
     required this.roomId,
-    required this.electricity,
-    required this.water,
-    required this.rubbish,
-    required this.laundry,
-    required this.wifi,
-    required this.updatedAt,
-  }) : serviceId = serviceId ?? uuid.v4();
-
+    required this.serviceType,
+    DateTime? updatedAt,
+    DateTime? timestamp,
+  })  : serviceId = serviceId ?? _uuid.v4(),
+        updatedAt = updatedAt ?? DateTime.now(),
+        timestamp = timestamp ?? DateTime.now();
   Map<String, dynamic> toMap() {
     return {
       'serviceId': serviceId,
       'roomId': roomId,
-      'electricity': electricity,
-      'water': water,
-      'rubbish': rubbish,
-      'laundry': laundry,
-      'wifi': wifi,
+      'serviceType': serviceType.name,
       'updatedAt': updatedAt.toIso8601String(),
+      'timestamp': timestamp.toIso8601String(),
     };
   }
-
-  factory Services.fromMap(Map<String, dynamic> map) {
-    return Services(
+  factory RoomService.fromMap(Map<String, dynamic> map) {
+    return RoomService(
       serviceId: map['serviceId'],
       roomId: map['roomId'],
-      electricity: map['electricity'] ?? false,
-      water: map['water'] ?? false,
-      rubbish: map['rubbish'] ?? false,
-      laundry: map['laundry'] ?? false,
-      wifi: map['wifi'] ?? false,
+      serviceType: ServiceType.values.firstWhere(
+        (e) => e.name == map['serviceType'],
+      ),
       updatedAt: DateTime.parse(map['updatedAt']),
+      timestamp: DateTime.parse(map['timestamp']),
     );
   }
-
-  Services copyWith({
+  RoomService copyWith({
     String? serviceId,
     String? roomId,
-    bool? electricity,
-    bool? water,
-    bool? rubbish,
-    bool? laundry,
-    bool? wifi,
+    ServiceType? serviceType,
     DateTime? updatedAt,
+    DateTime? timestamp,
   }) {
-    return Services(
+    return RoomService(
       serviceId: serviceId ?? this.serviceId,
       roomId: roomId ?? this.roomId,
-      electricity: electricity ?? this.electricity,
-      water: water ?? this.water,
-      rubbish: rubbish ?? this.rubbish,
-      laundry: laundry ?? this.laundry,
-      wifi: wifi ?? this.wifi,
+      serviceType: serviceType ?? this.serviceType,
       updatedAt: updatedAt ?? this.updatedAt,
+      timestamp: timestamp ?? this.timestamp,
     );
   }
 }
