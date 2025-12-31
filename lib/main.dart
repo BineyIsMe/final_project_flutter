@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ui/room_list.dart';
+import 'ui/room_details_page.dart';
 
 
 void main() {
@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: RoomListPage(),
+      home: RoomDetailsPage(),
     );
   }
 }
