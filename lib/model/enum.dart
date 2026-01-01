@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 enum Status { active, expired,available,other }
 
 enum ServiceStatus { on, off }
@@ -43,4 +45,26 @@ enum ServiceType {
   final ServiceStatus status;
 
   const ServiceType({required this.fee, required this.status});
+}
+
+enum HistoryType { payment, service, room }
+
+class HistoryItem {
+  final String id;
+  final HistoryType type;
+  final String title;
+  final String subtitle;
+  final DateTime dateTime;
+  final IconData icon;
+  final Color iconColor;
+
+  HistoryItem({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.subtitle,
+    required this.dateTime,
+    required this.icon,
+    required this.iconColor,
+  });
 }
