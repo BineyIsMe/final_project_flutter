@@ -12,9 +12,9 @@ class TenantForm extends StatefulWidget {
 }
 
 class _TenantFormState extends State<TenantForm> {
-  bool _isAddingTenant = true; // true = tenant form, false = room form
+  bool _isAddingTenant = true; 
   
-  //
+  
   final TextEditingController _tenantNameController = TextEditingController();
   final TextEditingController _contactInfoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -65,7 +65,7 @@ class _TenantFormState extends State<TenantForm> {
       ),
       body: Column(
         children: [
-          // Tab buttons
+         
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(16),
