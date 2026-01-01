@@ -1,4 +1,4 @@
-enum Status { active, expired,availble,other }
+enum Status { active, expired,available,other }
 
 
 enum ServiceStatus { on,off}

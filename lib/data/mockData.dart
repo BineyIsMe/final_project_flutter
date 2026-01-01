@@ -28,9 +28,9 @@ class MockData {
     Room(
       roomId: 'room-003',
       roomNumber: '103',
-      status: Status.availble,
+      status: Status.active,
       rentFee: 250.0,
-      notes: 'Currently under minor maintenance.',
+      notes: 'Near the stairs.',
       createdAt: DateTime.now().subtract(const Duration(days: 100)),
       updatedAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
@@ -42,6 +42,42 @@ class MockData {
       notes: 'Tenant moved out yesterday.',
       createdAt: DateTime.now().subtract(const Duration(days: 400)),
       updatedAt: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    Room(
+      roomId: 'room-005',
+      roomNumber: '202',
+      status: Status.active,
+      rentFee: 320.0,
+      notes: 'Corner room with great view.',
+      createdAt: DateTime.now().subtract(const Duration(days: 180)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+    Room(
+      roomId: 'room-006',
+      roomNumber: '203',
+      status: Status.available,
+      rentFee: 290.0,
+      notes: 'Available, freshly painted.',
+      createdAt: DateTime.now().subtract(const Duration(days: 50)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 3)),
+    ),
+    Room(
+      roomId: 'room-007',
+      roomNumber: '301',
+      status: Status.available,
+      rentFee: 310.0,
+      notes: 'Third floor, quiet area.',
+      createdAt: DateTime.now().subtract(const Duration(days: 80)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+    Room(
+      roomId: 'room-008',
+      roomNumber: '302',
+      status: Status.available,
+      rentFee: 275.0,
+      notes: 'Newly renovated.',
+      createdAt: DateTime.now().subtract(const Duration(days: 20)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];
   static final List<Tenant> tenants = [
@@ -77,6 +113,30 @@ class MockData {
       leaseStartDate: DateTime.now().subtract(const Duration(days: 100)),
       createdAt: DateTime.now().subtract(const Duration(days: 105)),
     ),
+   
+    Tenant(
+      tenantId: 'tenant-004',
+      roomId: 'room-003',
+      name: 'Kim Sophea',
+      phone: '015-888-999',
+      contactInfo: 'Email: sophea@example.com',
+      contractPlan: ContractPlan.threeMonths,
+      paymentPlan: PaymentPlan.oneMonth,
+      leaseStartDate: DateTime.now().subtract(const Duration(days: 85)), 
+      createdAt: DateTime.now().subtract(const Duration(days: 90)),
+    ),
+    
+    Tenant(
+      tenantId: 'tenant-005',
+      roomId: 'room-005',
+      name: 'Lim Bopha',
+      phone: '017-555-666',
+      imageUrl: 'https://i.pravatar.cc/150?u=tenant5',
+      contractPlan: ContractPlan.sixMonths,
+      paymentPlan: PaymentPlan.threeMonths,
+      leaseStartDate: DateTime.now().subtract(const Duration(days: 170)), // 6 months = 180 days, so expires in 10 days
+      createdAt: DateTime.now().subtract(const Duration(days: 175)),
+    ),
   ];
   static final List<RoomService> roomServices = [
     RoomService(
@@ -104,6 +164,31 @@ class MockData {
       serviceType: ServiceType.rubbish,
       updatedAt: DateTime.now(),
     ),
+    RoomService(
+      roomId: 'room-003',
+      serviceType: ServiceType.electricity,
+      updatedAt: DateTime.now(),
+    ),
+    RoomService(
+      roomId: 'room-003',
+      serviceType: ServiceType.water,
+      updatedAt: DateTime.now(),
+    ),
+    RoomService(
+      roomId: 'room-005',
+      serviceType: ServiceType.electricity,
+      updatedAt: DateTime.now(),
+    ),
+    RoomService(
+      roomId: 'room-005',
+      serviceType: ServiceType.water,
+      updatedAt: DateTime.now(),
+    ),
+    RoomService(
+      roomId: 'room-005',
+      serviceType: ServiceType.wifi,
+      updatedAt: DateTime.now(),
+    ),
   ];
 
   static final List<RentalService> rentalServices = [
@@ -120,6 +205,29 @@ class MockData {
       tenant: tenants[1], 
       services: roomServices.where((s) => s.roomId == 'room-002').toList(),
       createdAt: DateTime.now().subtract(const Duration(days: 120)),
+    ),
+    RentalService(
+      rentalId: 'rental-003',
+      room: rooms[3], 
+      tenant: tenants[2], 
+      services: roomServices.where((s) => s.roomId == 'room-004').toList(),
+      createdAt: DateTime.now().subtract(const Duration(days: 100)),
+    ),
+    
+    RentalService(
+      rentalId: 'rental-004',
+      room: rooms[2], 
+      tenant: tenants[3], 
+      services: roomServices.where((s) => s.roomId == 'room-003').toList(),
+      createdAt: DateTime.now().subtract(const Duration(days: 85)),
+    ),
+   
+    RentalService(
+      rentalId: 'rental-005',
+      room: rooms[4], 
+      tenant: tenants[4], 
+      services: roomServices.where((s) => s.roomId == 'room-005').toList(),
+      createdAt: DateTime.now().subtract(const Duration(days: 170)),
     ),
   ];
   static final List<RoomHistory> historyLogs = [
