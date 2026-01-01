@@ -107,8 +107,20 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
             const SizedBox(height: 24),
             
             // Contract Info
-            const InfoRow(label: 'Contract: 12months', value: 'Lease End'),
-            const InfoRow(label: 'Plan: 6months', value: 'Date/time'),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Column(
+                children: [
+                  InfoRow(label: 'Contract: 12months', value: 'Lease End'),
+                  SizedBox(height: 8),
+                  InfoRow(label: 'Plan: 6months', value: 'Date/time'),
+                ],
+              ),
+            ),
             
             const SizedBox(height: 20),
             
@@ -209,35 +221,47 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
                   const SizedBox(height: 24),
                   
                   // Actions Section
-                  const Text(
-                    'Actions',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ActionButton(
-                        icon: Icons.attach_money,
-                        label: 'Add Payment',
-                        iconColor: Colors.green,
-                        onPressed: () {
-                          // Add payment action not implemented yet
-                        },
-                      ),
-                      ActionButton(
-                        icon: Icons.refresh,
-                        label: 'Update Service',
-                        iconColor: Colors.green,
-                        onPressed: () {
-                          // Update service action not implemented yet
-                        },
-                      ),
-                    ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Actions',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ActionButton(
+                              icon: Icons.attach_money,
+                              label: 'Add Payment',
+                              iconColor: Colors.green,
+                              onPressed: () {
+                                // Add payment action not implemented yet
+                              },
+                            ),
+                            ActionButton(
+                              icon: Icons.refresh,
+                              label: 'Update Service',
+                              iconColor: Colors.green,
+                              onPressed: () {
+                                // Update service action not implemented yet
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

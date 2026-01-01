@@ -4,6 +4,7 @@ import 'package:myapp/model/RentalService.dart';
 import 'package:myapp/model/enum.dart';
 import 'widgets/room_card.dart';
 import 'widgets/buildSectionTitle.dart';
+import 'tenant_form.dart';
 
 
 class RoomListPage extends StatefulWidget {
@@ -82,6 +83,22 @@ class _RoomListPageState extends State<RoomListPage> {
     ).toList();
   }
 
+  bool get _hasNoRooms {
+    if (_selectedFilter == 'All') {
+      return _filteredOccupiedRooms.isEmpty && 
+             _filteredVacantRooms.isEmpty && 
+             _filteredExpiringSoonRooms.isEmpty && 
+             _filteredLateRooms.isEmpty;
+    } else if (_selectedFilter == 'Occupied') {
+      return _filteredOccupiedRooms.isEmpty;
+    } else if (_selectedFilter == 'Vacant') {
+      return _filteredVacantRooms.isEmpty;
+    } else if (_selectedFilter == 'Expire soon') {
+      return _filteredExpiringSoonRooms.isEmpty;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +125,12 @@ class _RoomListPageState extends State<RoomListPage> {
             child: IconButton(
               icon: const Icon(Icons.add, color: Colors.white),
               onPressed: () {
-                // Navigate to add room not implemented yet
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TenantForm(),
+                  ),
+                );
               },
             ),
           ),
@@ -166,11 +188,13 @@ class _RoomListPageState extends State<RoomListPage> {
 
           
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+              child: _hasNoRooms 
+                ? _buildEmptyState() 
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                     // Occupied Section
                     if ((_selectedFilter == 'All' || _selectedFilter == 'Occupied') && _filteredOccupiedRooms.isNotEmpty) ...[
                       SectionTitle(title: 'Occupied'),
@@ -248,6 +272,86 @@ class _RoomListPageState extends State<RoomListPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.door_front_door_outlined,
+              size: 60,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'No Rooms Available',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'lalallallallallalallallalallallalla\nlalla,lalals',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 100),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TenantForm(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF81B4A1),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      'Add New Room',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

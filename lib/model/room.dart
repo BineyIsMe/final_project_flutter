@@ -67,7 +67,7 @@ class Room {
   }
 
   bool isAvailable() {
-    return status == Status.availble;
+    return status == Status.available;
   }
 
   Map<String, dynamic> toMap() {
