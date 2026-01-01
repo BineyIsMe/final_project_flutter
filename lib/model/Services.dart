@@ -1,23 +1,50 @@
+import 'package:myapp/model/RoomHistory.dart';
 import 'package:myapp/model/enum.dart';
 import 'package:uuid/uuid.dart';
+
 class RoomService {
   static final _uuid = Uuid();
 
   final String serviceId;
   final String roomId;
   final ServiceType serviceType;
-  final DateTime updatedAt;
+  DateTime updatedAt;
   final DateTime timestamp;
+  ServiceStatus status;
 
   RoomService({
     String? serviceId,
     required this.roomId,
     required this.serviceType,
+    ServiceStatus? status,
     DateTime? updatedAt,
     DateTime? timestamp,
-  })  : serviceId = serviceId ?? _uuid.v4(),
-        updatedAt = updatedAt ?? DateTime.now(),
-        timestamp = timestamp ?? DateTime.now();
+  }) : serviceId = serviceId ?? _uuid.v4(),
+       status = status ?? serviceType.status,
+       updatedAt = updatedAt ?? DateTime.now(),
+       timestamp = timestamp ?? DateTime.now();
+
+  void updateService(ServiceType type, bool isOn, RoomHistory historyService) {
+    if (serviceType == type) {
+      final newStatus = isOn ? ServiceStatus.on : ServiceStatus.off;
+      status = newStatus;
+      updatedAt = DateTime.now();
+      recordServiceChange(type, newStatus, historyService);
+    }
+  }
+
+  void recordServiceChange(
+    ServiceType serviceType,
+    ServiceStatus newStatus,
+    RoomHistory historyService,
+  ) {
+    historyService.createHistory(
+      roomId,
+      HistoryActionType.serviceUpdated,
+      "${serviceType.name.toUpperCase()} service turned ${newStatus.name}",
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'serviceId': serviceId,
@@ -27,6 +54,7 @@ class RoomService {
       'timestamp': timestamp.toIso8601String(),
     };
   }
+
   factory RoomService.fromMap(Map<String, dynamic> map) {
     return RoomService(
       serviceId: map['serviceId'],

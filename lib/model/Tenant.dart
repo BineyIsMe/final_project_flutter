@@ -1,3 +1,4 @@
+import 'package:myapp/model/RoomHistory.dart';
 import 'package:uuid/uuid.dart';
 import 'enum.dart';
 
@@ -5,11 +6,11 @@ class Tenant {
   static final uuid = Uuid();
 
   final String tenantId;
-  final String roomId;
-  final String name;
-  final String phone;
-  final String? imageUrl;
-  final String? contactInfo;
+  String? roomId;
+  String name;
+  String phone;
+  String? imageUrl;
+  String? contactInfo;
   final ContractPlan contractPlan;
   final PaymentPlan paymentPlan;
   final DateTime leaseStartDate;
@@ -27,13 +28,43 @@ class Tenant {
     required this.paymentPlan,
     DateTime? leaseStartDate,
     DateTime? createdAt,
-  })  : tenantId = tenantId ?? uuid.v4(),
-        leaseStartDate = leaseStartDate ?? DateTime.now(),
-        leaseEndDate = (leaseStartDate ?? DateTime.now())
-            .add(Duration(
-              days: (contractPlan.durationInMonths * 30),
-            )),
-        createdAt = createdAt ?? DateTime.now();
+  }) : tenantId = tenantId ?? uuid.v4(),
+       leaseStartDate = leaseStartDate ?? DateTime.now(),
+       leaseEndDate = (leaseStartDate ?? DateTime.now()).add(
+         Duration(days: (contractPlan.durationInMonths * 30)),
+       ),
+       createdAt = createdAt ?? DateTime.now();
+
+  void updateContact(String newPhone, String? newContactInfo) {
+    phone = newPhone;
+    if (newContactInfo != null) {
+      contactInfo = newContactInfo;
+    }
+  }
+
+  void updateImage(String newImageUrl) {
+    imageUrl = newImageUrl;
+  }
+
+  void assignRoom(String newRoomId, RoomHistory historyService) {
+    roomId = newRoomId;
+    historyService.createHistory(
+      newRoomId,
+      HistoryActionType.newTenantAdded,
+      "Tenant $name moved in / assigned to room.",
+    );
+  }
+
+  void removeFromRoom(RoomHistory historyService) {
+    if (roomId != null) {
+      historyService.createHistory(
+        roomId!,
+        HistoryActionType.roomDeadlineChanged,
+        "Tenant $name removed/moved out.",
+      );
+      roomId = null;
+    }
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -55,6 +86,11 @@ class Tenant {
     final startDate = DateTime.parse(map['leaseStartDate']);
     final plan = ContractPlan.values.firstWhere(
       (e) => e.name == map['contractPlan'],
+      orElse: () => ContractPlan.sixMonths,
+    );
+    final pPlan = PaymentPlan.values.firstWhere(
+      (e) => e.name == map['paymentPlan'],
+      orElse: () => PaymentPlan.oneMonth,
     );
 
     return Tenant(
@@ -65,9 +101,7 @@ class Tenant {
       imageUrl: map['imageUrl'],
       contactInfo: map['contactInfo'],
       contractPlan: plan,
-      paymentPlan: PaymentPlan.values.firstWhere(
-        (e) => e.name == map['paymentPlan'],
-      ),
+      paymentPlan: pPlan,
       leaseStartDate: startDate,
       createdAt: DateTime.parse(map['createdAt']),
     );
@@ -86,9 +120,6 @@ class Tenant {
     DateTime? leaseEndDate,
     DateTime? createdAt,
   }) {
-    final start = leaseStartDate ?? this.leaseStartDate;
-    final plan = contractPlan ?? this.contractPlan;
-
     return Tenant(
       tenantId: tenantId ?? this.tenantId,
       roomId: roomId ?? this.roomId,
@@ -96,9 +127,9 @@ class Tenant {
       phone: phone ?? this.phone,
       imageUrl: imageUrl ?? this.imageUrl,
       contactInfo: contactInfo ?? this.contactInfo,
-      contractPlan: plan,
+      contractPlan: contractPlan ?? this.contractPlan,
       paymentPlan: paymentPlan ?? this.paymentPlan,
-      leaseStartDate: start,
+      leaseStartDate: leaseStartDate ?? this.leaseStartDate,
       createdAt: createdAt ?? this.createdAt,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:myapp/model/RoomHistory.dart';
 import 'package:myapp/model/enum.dart';
 import 'package:uuid/uuid.dart';
 
@@ -7,10 +8,10 @@ class Room {
   final String roomId;
   final String roomNumber;
   Status status;
-  final double rentFee; 
-  final String? notes;
+  final double rentFee;
+  String? notes;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  DateTime updatedAt;
 
   Room({
     String? roomId,
@@ -21,6 +22,53 @@ class Room {
     required this.createdAt,
     required this.updatedAt,
   }) : roomId = roomId ?? uuid.v4();
+  void changeStatus(Status newStatus, RoomHistory historyService) {
+    status = newStatus;
+    updatedAt = DateTime.now();
+    historyService.createHistory(
+      roomId,
+      HistoryActionType.serviceUpdated,
+      "Status changed to ${newStatus.name}",
+    );
+  }
+
+  static Room create({
+    required String roomNumber,
+    required double rentFee,
+    String? notes,
+    required RoomHistory historyService,
+    required Status status,
+  }) {
+    final newRoom = Room(
+      roomNumber: roomNumber,
+      status: status,
+      rentFee: rentFee,
+      notes: notes,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+    historyService.createHistory(
+      newRoom.roomId,
+      HistoryActionType.roomCardUpdated,
+      "New Room $roomNumber created successfully.",
+    );
+
+    return newRoom;
+  }
+
+  void updateNotes(String newNotes, RoomHistory historyService) {
+    notes = newNotes;
+    updatedAt = DateTime.now();
+    historyService.createHistory(
+      roomId,
+      HistoryActionType.roomDeadlineChanged,
+      "Notes updated: $newNotes",
+    );
+  }
+
+  bool isAvailable() {
+    return status == Status.availble;
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -54,8 +102,6 @@ class Room {
     String? roomNumber,
     Status? status,
     double? rentFee,
-    DateTime? leaseStartDate,
-    DateTime? leaseEndDate,
     String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,

@@ -1,3 +1,4 @@
+// import 'package:myapp/data/mockData.dart';
 import 'package:myapp/model/enum.dart';
 import 'package:uuid/uuid.dart';
 
@@ -55,5 +56,28 @@ class RoomHistory {
       description: description ?? this.description,
       timestamp: timestamp ?? this.timestamp,
     );
+  }
+
+  final List<RoomHistory> _historyDatabase = [];
+
+  void createHistory(
+    String roomId,
+    HistoryActionType actionType,
+    String description,
+  ) {
+    final newHistory = RoomHistory(
+      roomId: roomId,
+      actionType: actionType,
+      description: description,
+      timestamp: DateTime.now(),
+    );
+    _historyDatabase.add(newHistory);
+    // MockData.historyLogs.add(newHistory);
+  }
+
+  List<RoomHistory> getRoomHistory(String roomId) {
+    return _historyDatabase
+        .where((history) => history.roomId == roomId)
+        .toList();
   }
 }
