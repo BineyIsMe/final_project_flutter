@@ -29,17 +29,17 @@ class ServiceCheckboxItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Checkbox
+
           Checkbox(
             value: isSelected,
             onChanged: onChanged,
             activeColor: const Color(0xFF81B4A1),
           ),
           const SizedBox(width: 8),
-          // Service icon
+
           Icon(icon, size: 20, color: iconColor),
           const SizedBox(width: 12),
-          // Service details
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

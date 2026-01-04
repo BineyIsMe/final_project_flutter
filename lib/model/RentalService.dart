@@ -9,6 +9,7 @@ class RentalService {
   static final uuid = Uuid();
 
   final String rentalId;
+
   Room room;
   Tenant tenant;
   List<RoomService> services;
@@ -26,17 +27,34 @@ class RentalService {
        createdAt = createdAt ?? DateTime.now(),
        updatedAt = updatedAt ?? DateTime.now();
 
+  int get daysUntilExpiry {
+    final now = DateTime.now();
+
+    return tenant.leaseEndDate.difference(now).inDays;
+  }
+
+  bool get isLate {
+    return daysUntilExpiry < 0;
+  }
+
+  void updateTenantData(Tenant updatedTenant) {
+    tenant = updatedTenant;
+    updatedAt = DateTime.now();
+  }
+
   void assignTenantToRoom(
     Tenant newTenant,
     Room newRoom,
     ContractPlan contractPlan,
     PaymentPlan paymentPlan,
     DateTime startDate,
-    RoomHistory historyService,
+    List<RoomService> newServices,
   ) {
     room = newRoom;
     tenant = newTenant;
+    services = newServices; 
     updatedAt = DateTime.now();
+
     tenant = tenant.copyWith(
       roomId: room.roomId,
       contractPlan: contractPlan,
@@ -44,8 +62,10 @@ class RentalService {
       leaseStartDate: startDate,
       leaseEndDate: contractPlan.getLeaseEndDate(startDate: startDate),
     );
-    room.changeStatus(Status.active, historyService);
-    historyService.createHistory(
+    
+    room.changeStatus(Status.active);
+
+    RoomHistory.createHistory(
       room.roomId,
       HistoryActionType.newTenantAdded,
       "Rental Contract started for ${tenant.name}. Plan: ${contractPlan.name}",
@@ -54,15 +74,16 @@ class RentalService {
     print("Tenant ${tenant.name} assigned to Room ${room.roomNumber}");
   }
 
-  void endRental(Tenant t, DateTime endDate, RoomHistory historyService) {
+  void endRental(Tenant t, DateTime endDate) {
     if (tenant.tenantId != t.tenantId) {
       print("Can't find tenant id");
       return;
     }
 
-    tenant.removeFromRoom(historyService);
-    room.changeStatus(Status.expired, historyService);
-    historyService.createHistory(
+    tenant.removeFromRoom(); 
+    room.changeStatus(Status.expired); 
+
+    RoomHistory.createHistory(
       room.roomId,
       HistoryActionType.roomDeadlineChanged,
       "Rental ended on $endDate",
@@ -71,62 +92,26 @@ class RentalService {
     updatedAt = DateTime.now();
   }
 
-  void enableService(
-    Room r,
-    ServiceType serviceType,
-    RoomHistory historyService,
-  ) {
+  void enableService(Room r, ServiceType serviceType) {
     final index = services.indexWhere((s) => s.serviceType == serviceType);
 
     if (index != -1) {
-      services[index].updateService(serviceType, true, historyService);
+      services[index].updateService(serviceType, true);
       updatedAt = DateTime.now();
     } else {
       print("Service ${serviceType.name} not found for this room.");
     }
   }
 
-  void disableService(
-    Room r,
-    ServiceType serviceType,
-    RoomHistory historyService,
-  ) {
+  void disableService(Room r, ServiceType serviceType) {
     final index = services.indexWhere((s) => s.serviceType == serviceType);
 
     if (index != -1) {
-      services[index].updateService(serviceType, false, historyService);
+      services[index].updateService(serviceType, false);
       updatedAt = DateTime.now();
     }
   }
 
-  void rentDeadline(Tenant tenant) {
-    final today = DateTime.now();
-    final difference = tenant.leaseEndDate.difference(today).inDays;
-
-    if (difference < 0) {
-      print(
-        "ALERT: Rent for ${tenant.name} was due ${difference.abs()} days ago!",
-      );
-    } else if (difference <= 3) {
-      print("WARNING: Rent for ${tenant.name} is due in $difference days.");
-    } else {
-      print("STATUS: Rent is safe. Due in $difference days.");
-    }
-  }
-
-  void allSevicesDeadline(Room room, Tenant tenant) {
-    final now = DateTime.now();
-    if (now.day > 25) {
-      print(
-        "REMINDER: Check meter readings for Room ${room.roomNumber}. End of month approaching.",
-      );
-    }
-    for (var s in services) {
-      if (s.status == ServiceStatus.on) {
-        print("Service Active: ${s.serviceType.name} - Fee accumulating.");
-      }
-    }
-  }
 
   Map<String, dynamic> toMap() {
     return {

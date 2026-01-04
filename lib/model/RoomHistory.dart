@@ -1,4 +1,4 @@
-// import 'package:myapp/data/mockData.dart';
+import 'package:myapp/data/mockData.dart';
 import 'package:myapp/model/enum.dart';
 import 'package:uuid/uuid.dart';
 
@@ -58,9 +58,7 @@ class RoomHistory {
     );
   }
 
-  final List<RoomHistory> _historyDatabase = [];
-
-  void createHistory(
+static void createHistory(
     String roomId,
     HistoryActionType actionType,
     String description,
@@ -71,12 +69,16 @@ class RoomHistory {
       description: description,
       timestamp: DateTime.now(),
     );
-    _historyDatabase.add(newHistory);
-    // MockData.historyLogs.add(newHistory);
+    
+    // Add to list (in memory)
+    MockData.historyLogs.add(newHistory);
+    
+    // NEW: Save to JSON File
+    MockData().sync(); 
   }
 
-  List<RoomHistory> getRoomHistory(String roomId) {
-    return _historyDatabase
+  static List<RoomHistory> getRoomHistory(String roomId) {
+    return MockData.historyLogs
         .where((history) => history.roomId == roomId)
         .toList();
   }

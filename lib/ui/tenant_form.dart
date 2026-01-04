@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/data/mockData.dart';
 import 'package:myapp/model/enum.dart';
-import 'widgets/custom_dropdown.dart';
-import 'widgets/custom_button.dart';
-import 'widgets/custom_textfield.dart';
+import 'package:myapp/model/Tenant.dart';
+import 'package:myapp/model/room.dart';
+import 'package:myapp/ui/widgets/tenantFormWidget/roomInputForm.dart';
+import 'package:myapp/ui/widgets/tenantFormWidget/tenantInputForm.dart';
 
 class TenantForm extends StatefulWidget {
   const TenantForm({super.key});
@@ -12,22 +14,20 @@ class TenantForm extends StatefulWidget {
 }
 
 class _TenantFormState extends State<TenantForm> {
-  bool _isAddingTenant = true; 
-  
-  
+  bool _isAddingTenant = true;
+
   final TextEditingController _tenantNameController = TextEditingController();
   final TextEditingController _contactInfoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _tenantNotesController = TextEditingController();
-  
+
   String? _selectedContractPlan;
   String? _selectedPaymentPlan;
-
 
   final TextEditingController _roomNumberController = TextEditingController();
   final TextEditingController _rentFeeController = TextEditingController();
   final TextEditingController _roomNotesController = TextEditingController();
-  
+
   String? _selectedStatus;
 
   @override
@@ -40,6 +40,92 @@ class _TenantFormState extends State<TenantForm> {
     _rentFeeController.dispose();
     _roomNotesController.dispose();
     super.dispose();
+  }
+
+  void _handleSaveTenant() {
+    if (_tenantNameController.text.isEmpty ||
+        _contactInfoController.text.isEmpty ||
+        _selectedContractPlan == null ||
+        _selectedPaymentPlan == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    try {
+      final contractPlan = ContractPlan.values.firstWhere(
+        (e) => e.name == _selectedContractPlan,
+      );
+      final paymentPlan = PaymentPlan.values.firstWhere(
+        (e) => e.name == _selectedPaymentPlan,
+      );
+
+      final newTenant = Tenant(
+        roomId: null,
+        name: _tenantNameController.text,
+        phone: _contactInfoController.text,
+        contactInfo: _emailController.text,
+        contractPlan: contractPlan,
+        paymentPlan: paymentPlan,
+      );
+
+      MockData.tenants.add(newTenant);
+      MockData().sync();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${newTenant.name} created. Go to Room list to assign.',
+          ),
+        ),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error adding tenant: $e')));
+    }
+  }
+
+  void _handleSaveRoom() {
+    if (_roomNumberController.text.isEmpty ||
+        _rentFeeController.text.isEmpty ||
+        _selectedStatus == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    try {
+      double rentFee = double.parse(_rentFeeController.text);
+
+      final room = Room.create(
+        roomNumber: _roomNumberController.text,
+        rentFee: rentFee,
+        notes: _roomNotesController.text.isEmpty
+            ? null
+            : _roomNotesController.text,
+      );
+
+      Status status = Status.values.firstWhere(
+        (e) => e.name == _selectedStatus,
+      );
+      room.changeStatus(status);
+
+      MockData.rooms.add(room);
+      MockData().sync();
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Room added successfully')));
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Invalid Rent Fee format')));
+    }
   }
 
   @override
@@ -65,7 +151,6 @@ class _TenantFormState extends State<TenantForm> {
       ),
       body: Column(
         children: [
-         
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(16),
@@ -73,16 +158,12 @@ class _TenantFormState extends State<TenantForm> {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isAddingTenant = true;
-                      });
-                    },
+                    onTap: () => setState(() => _isAddingTenant = true),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _isAddingTenant 
-                            ? const Color(0xFF81B4A1) 
+                        color: _isAddingTenant
+                            ? const Color(0xFF81B4A1)
                             : Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -90,7 +171,9 @@ class _TenantFormState extends State<TenantForm> {
                         child: Text(
                           'Add New Tenant',
                           style: TextStyle(
-                            color: _isAddingTenant ? Colors.white : Colors.grey[600],
+                            color: _isAddingTenant
+                                ? Colors.white
+                                : Colors.grey[600],
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -102,16 +185,12 @@ class _TenantFormState extends State<TenantForm> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isAddingTenant = false;
-                      });
-                    },
+                    onTap: () => setState(() => _isAddingTenant = false),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: !_isAddingTenant 
-                            ? const Color(0xFF81B4A1) 
+                        color: !_isAddingTenant
+                            ? const Color(0xFF81B4A1)
                             : Colors.grey[200],
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -119,7 +198,9 @@ class _TenantFormState extends State<TenantForm> {
                         child: Text(
                           'Add New Room',
                           style: TextStyle(
-                            color: !_isAddingTenant ? Colors.white : Colors.grey[600],
+                            color: !_isAddingTenant
+                                ? Colors.white
+                                : Colors.grey[600],
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -131,276 +212,34 @@ class _TenantFormState extends State<TenantForm> {
               ],
             ),
           ),
+
           Expanded(
             child: Container(
               color: Colors.white,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: _isAddingTenant ? _buildTenantForm() : _buildRoomForm(),
-              ),
+              child: _isAddingTenant 
+              ? TenantInputForm(
+                  nameController: _tenantNameController,
+                  contactController: _contactInfoController,
+                  emailController: _emailController,
+                  notesController: _tenantNotesController,
+                  selectedContractPlan: _selectedContractPlan,
+                  selectedPaymentPlan: _selectedPaymentPlan,
+                  onContractChanged: (v) => setState(() => _selectedContractPlan = v),
+                  onPaymentChanged: (v) => setState(() => _selectedPaymentPlan = v),
+                  onSave: _handleSaveTenant,
+                ) 
+              : RoomInputForm(
+                  roomNumberController: _roomNumberController,
+                  rentFeeController: _rentFeeController,
+                  notesController: _roomNotesController,
+                  selectedStatus: _selectedStatus,
+                  onStatusChanged: (v) => setState(() => _selectedStatus = v),
+                  onSave: _handleSaveRoom,
+                ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTenantForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Tenant Name',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomTextField(
-          controller: _tenantNameController,
-          hint: 'John Doe',
-          icon: Icons.person_outline,
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Contact Info',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomTextField(
-          controller: _contactInfoController,
-          hint: '(856)-456-7890',
-          icon: Icons.phone_outlined,
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Email',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomTextField(
-          controller: _emailController,
-          hint: 'Keaklarmer.Cambodia@gmail.com',
-          icon: Icons.email_outlined,
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Contract plan',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomDropdown(
-          value: _selectedContractPlan,
-          hint: 'Contract plan',
-          icon: Icons.description_outlined,
-          items: ContractPlan.values.map((plan) {
-            String displayName;
-            switch (plan) {
-              case ContractPlan.threeMonths:
-                displayName = '3 Months';
-                break;
-              case ContractPlan.sixMonths:
-                displayName = '6 Months';
-                break;
-              case ContractPlan.oneYear:
-                displayName = '1 Year';
-                break;
-              case ContractPlan.oneAndHalfYears:
-                displayName = '1.5 Years';
-                break;
-              case ContractPlan.twoYears:
-                displayName = '2 Years';
-                break;
-            }
-            return DropdownMenuItem(
-              value: plan.name,
-              child: Text(displayName),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedContractPlan = value;
-            });
-          },
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Payment plan',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomDropdown(
-          value: _selectedPaymentPlan,
-          hint: 'Payment plan',
-          icon: Icons.payment_outlined,
-          items: PaymentPlan.values.map((plan) {
-            String displayName;
-            switch (plan) {
-              case PaymentPlan.oneWeek:
-                displayName = '1 Week';
-                break;
-              case PaymentPlan.twoWeeks:
-                displayName = '2 Weeks';
-                break;
-              case PaymentPlan.oneMonth:
-                displayName = '1 Month';
-                break;
-              case PaymentPlan.threeMonths:
-                displayName = '3 Months';
-                break;
-            }
-            return DropdownMenuItem(
-              value: plan.name,
-              child: Text(displayName),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedPaymentPlan = value;
-            });
-          },
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Notes',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomTextField(
-          controller: _tenantNotesController,
-          hint: 'Text',
-          maxLines: 4,
-        ),
-        const SizedBox(height: 30),
-        CustomButton(
-          text: 'Save',
-          onPressed: () {
-            // Handle save tenant action here but not implemented yet
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRoomForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Room Number',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomTextField(
-          controller: _roomNumberController,
-          hint: 'John Doe',
-          icon: Icons.person_outline,
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Status',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomDropdown(
-          value: _selectedStatus,
-          hint: 'Status',
-          icon: Icons.info_outline,
-          items: Status.values.map((status) {
-            String displayName;
-            switch (status) {
-              case Status.active:
-                displayName = 'Active';
-                break;
-              case Status.available:
-                displayName = 'Available';
-                break;
-              case Status.expired:
-                displayName = 'Expired';
-                break;
-              case Status.other:
-                displayName = 'Other';
-                break;
-            }
-            return DropdownMenuItem(
-              value: status.name,
-              child: Text(displayName),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedStatus = value;
-            });
-          },
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Rent Fee',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomTextField(
-          controller: _rentFeeController,
-          hint: 'Keaklarmer.Cambodia@gmail.com',
-          icon: Icons.attach_money_outlined,
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          'Notes',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomTextField(
-          controller: _roomNotesController,
-          hint: 'Text',
-          maxLines: 4,
-        ),
-        const SizedBox(height: 30),
-        CustomButton(
-          text: 'Save',
-          onPressed: () {
-            // Handle save room action here but not implemented yet
-          },
-        ),
-      ],
     );
   }
 }

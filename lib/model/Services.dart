@@ -24,21 +24,20 @@ class RoomService {
        updatedAt = updatedAt ?? DateTime.now(),
        timestamp = timestamp ?? DateTime.now();
 
-  void updateService(ServiceType type, bool isOn, RoomHistory historyService) {
+  void updateService(ServiceType type, bool isOn) {
     if (serviceType == type) {
       final newStatus = isOn ? ServiceStatus.on : ServiceStatus.off;
       status = newStatus;
       updatedAt = DateTime.now();
-      recordServiceChange(type, newStatus, historyService);
+      recordServiceChange(type, newStatus);
     }
   }
 
   void recordServiceChange(
     ServiceType serviceType,
     ServiceStatus newStatus,
-    RoomHistory historyService,
   ) {
-    historyService.createHistory(
+    RoomHistory.createHistory(
       roomId,
       HistoryActionType.serviceUpdated,
       "${serviceType.name.toUpperCase()} service turned ${newStatus.name}",
@@ -66,6 +65,7 @@ class RoomService {
       timestamp: DateTime.parse(map['timestamp']),
     );
   }
+  
   RoomService copyWith({
     String? serviceId,
     String? roomId,

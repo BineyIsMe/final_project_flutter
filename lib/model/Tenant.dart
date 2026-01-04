@@ -46,18 +46,18 @@ class Tenant {
     imageUrl = newImageUrl;
   }
 
-  void assignRoom(String newRoomId, RoomHistory historyService) {
+  void assignRoom(String newRoomId) {
     roomId = newRoomId;
-    historyService.createHistory(
+    RoomHistory.createHistory(
       newRoomId,
       HistoryActionType.newTenantAdded,
       "Tenant $name moved in / assigned to room.",
     );
   }
 
-  void removeFromRoom(RoomHistory historyService) {
+  void removeFromRoom() {
     if (roomId != null) {
-      historyService.createHistory(
+      RoomHistory.createHistory(
         roomId!,
         HistoryActionType.roomDeadlineChanged,
         "Tenant $name removed/moved out.",

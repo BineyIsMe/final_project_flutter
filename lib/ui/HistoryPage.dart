@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:myapp/data/mockData.dart';
+import 'package:myapp/model/RoomHistory.dart';
 import 'package:myapp/model/enum.dart';
+import 'package:myapp/ui/widgets/buildHistoryItem.dart';
+import 'package:myapp/ui/widgets/buildSectionHeader.dart';
 import 'package:myapp/ui/widgets/custom_textfield.dart';
 import 'package:myapp/ui/widgets/filter_chip_button.dart';
 import 'package:myapp/ui/widgets/service_item.dart';
-
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -16,51 +20,93 @@ class _HistoryPageState extends State<HistoryPage> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedFilter = 'All';
 
-  final List<String> _filters = ['All', 'Payment', 'Services', 'Rooms'];
-  final List<HistoryItem> _historyItems = [
-    HistoryItem(
-      id: '1',
-      type: HistoryType.payment,
-      title: 'Payment For Room 201',
-      subtitle: 'Amount: 250\$',
-      dateTime: DateTime.now(),
-      icon: Icons.money,
-      iconColor: Colors.green,
-    ),
-    HistoryItem(
-      id: '2',
-      type: HistoryType.service,
-      title: 'Laundry Service Completed',
-      subtitle: 'For Room 201',
-      dateTime: DateTime.now(),
-      icon: Icons.local_laundry_service,
-      iconColor: Colors.orange,
-    ),
-    HistoryItem(
-      id: '3',
-      type: HistoryType.room,
-      title: 'Cleaning Room',
-      subtitle: 'Room 201',
-      dateTime: DateTime.now().subtract(const Duration(days: 1)),
-      icon: Icons.cleaning_services_outlined,
-      iconColor: Colors.green,
-    ),
-    HistoryItem(
-      id: '4',
-      type: HistoryType.service,
-      title: 'WIFI Service',
-      subtitle: 'Room 201',
-      dateTime: DateTime.now().subtract(const Duration(days: 1)),
-      icon: Icons.wifi,
-      iconColor: Colors.green,
-    ),
-  ];
+  final List<String> _filters = const ['All', 'Payment', 'Services', 'Rooms'];
+  List<dynamic> _displayList = []; 
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshData();
+    _searchController.addListener(_refreshData);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_refreshData);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _refreshData() {
+    final searchQuery = _searchController.text.toLowerCase();
+    final allLogs = List<RoomHistory>.from(MockData.historyLogs)
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    final filteredLogs = allLogs.where((item) {
+      final matchesSearch = item.description.toLowerCase().contains(searchQuery);
+      if (!matchesSearch) return false;
+
+      switch (_selectedFilter) {
+        case 'Payment':
+          return item.actionType == HistoryActionType.paymentAdded;
+        case 'Services':
+          return item.actionType == HistoryActionType.serviceUpdated;
+        case 'Rooms':
+          return item.actionType == HistoryActionType.roomDeadlineChanged ||
+                 item.actionType == HistoryActionType.newTenantAdded ||
+                 item.actionType == HistoryActionType.roomCardUpdated;
+        case 'All':
+        default:
+          return true;
+      }
+    }).toList();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    List<dynamic> tempList = [];
+
+    final todayItems = filteredLogs.where((i) {
+      final d = i.timestamp;
+      return d.year == today.year && d.month == today.month && d.day == today.day;
+    }).toList();
+
+    if (todayItems.isNotEmpty) {
+      tempList.add("Today");
+      tempList.addAll(todayItems);
+    }
+    final yesterdayItems = filteredLogs.where((i) {
+      final d = i.timestamp;
+      return d.year == yesterday.year && d.month == yesterday.month && d.day == yesterday.day;
+    }).toList();
+
+    if (yesterdayItems.isNotEmpty) {
+      tempList.add("Yesterday");
+      tempList.addAll(yesterdayItems);
+    }
+
+    final olderItems = filteredLogs.where((i) {
+      final d = i.timestamp;
+      final dateOnly = DateTime(d.year, d.month, d.day);
+      return dateOnly.isBefore(yesterday);
+    }).toList();
+
+    if (olderItems.isNotEmpty) {
+      tempList.add("Older");
+      tempList.addAll(olderItems);
+    }
+
+    if (tempList.isEmpty) {
+      tempList.add("EMPTY_STATE");
+    }
+
+    setState(() {
+      _displayList = tempList;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final todayItems = _historyItems.where(_isToday).toList();
-    final yesterdayItems = _historyItems.where(_isYesterday).toList();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -85,7 +131,6 @@ class _HistoryPageState extends State<HistoryPage> {
         child: Column(
           children: [
             const SizedBox(height: 10),
-
             Row(
               children: [
                 Expanded(
@@ -110,9 +155,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -126,28 +169,38 @@ class _HistoryPageState extends State<HistoryPage> {
                         setState(() {
                           _selectedFilter = filter;
                         });
+                        _refreshData(); 
                       },
                     ),
                   );
                 }).toList(),
               ),
             ),
-
             const SizedBox(height: 20),
-
             Expanded(
-              child: ListView(
-                children: [
-                  if (todayItems.isNotEmpty) ...[
-                    _buildSectionHeader('Today'),
-                    ...todayItems.map(_buildHistoryItem),
-                  ],
-                  if (yesterdayItems.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    _buildSectionHeader('Yesterday'),
-                    ...yesterdayItems.map(_buildHistoryItem),
-                  ],
-                ],
+              child: ListView.builder(
+                itemCount: _displayList.length,
+                itemBuilder: (context, index) {
+                  final item = _displayList[index];
+
+
+                  if (item is String) {
+                    if (item == "EMPTY_STATE") {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: Center(child: Text('No history found')),
+                      );
+                    }
+                    return HistorySectionHeader(title: item);
+                  }
+
+
+                  if (item is RoomHistory) {
+                    return HistoryItemCard(item: item);
+                  }
+
+                  return const SizedBox();
+                },
               ),
             ),
           ],
@@ -155,73 +208,5 @@ class _HistoryPageState extends State<HistoryPage> {
       ),
     );
   }
-
-  Widget _buildHistoryItem(HistoryItem item) {
-    return _buildHistoryCard(
-      icon: item.icon,
-      iconColor: item.iconColor,
-      title: item.title,
-      subtitle: item.subtitle,
-      time: _formatTime(item.dateTime),
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Center(
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHistoryCard({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    required String time,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0F0F0),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ServiceItem(
-        icon: icon,
-        iconColor: iconColor,
-        name: title,
-        description: subtitle,
-        price: '',
-        dateTime: time,
-      ),
-    );
-  }
-
-  bool _isToday(HistoryItem item) {
-    final now = DateTime.now();
-    return item.dateTime.year == now.year &&
-        item.dateTime.month == now.month &&
-        item.dateTime.day == now.day;
-  }
-
-  bool _isYesterday(HistoryItem item) {
-    final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    return item.dateTime.year == yesterday.year &&
-        item.dateTime.month == yesterday.month &&
-        item.dateTime.day == yesterday.day;
-  }
-
-  String _formatTime(DateTime dateTime) {
-    return '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
-  }
 }
+

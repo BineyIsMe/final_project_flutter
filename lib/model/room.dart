@@ -1,5 +1,5 @@
-import 'package:myapp/model/RoomHistory.dart';
 import 'package:myapp/model/enum.dart';
+import 'package:myapp/model/RoomHistory.dart'; 
 import 'package:uuid/uuid.dart';
 
 class Room {
@@ -22,46 +22,49 @@ class Room {
     required this.createdAt,
     required this.updatedAt,
   }) : roomId = roomId ?? uuid.v4();
-  void changeStatus(Status newStatus, RoomHistory historyService) {
+
+  static Room create({
+    required String roomNumber,
+    required double rentFee,
+    String? notes,
+  }) {
+    final newRoom = Room(
+      roomNumber: roomNumber,
+      status: Status.active,
+      rentFee: rentFee,
+      notes: notes,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    RoomHistory.createHistory(
+      newRoom.roomId,
+      HistoryActionType.roomCardUpdated, 
+      "New Room $roomNumber created.",
+    );
+
+    return newRoom;
+  }
+
+  void changeStatus(Status newStatus) {
     status = newStatus;
     updatedAt = DateTime.now();
-    historyService.createHistory(
+
+    RoomHistory.createHistory(
       roomId,
       HistoryActionType.serviceUpdated,
       "Status changed to ${newStatus.name}",
     );
   }
 
-  static Room create({
-    required String roomNumber,
-    required double rentFee,
-    String? notes,
-    required RoomHistory historyService,
-    required Status status,
-  }) {
-    final newRoom = Room(
-      roomNumber: roomNumber,
-      status: status,
-      rentFee: rentFee,
-      notes: notes,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    historyService.createHistory(
-      newRoom.roomId,
-      HistoryActionType.roomCardUpdated,
-      "New Room $roomNumber created successfully.",
-    );
 
-    return newRoom;
-  }
-
-  void updateNotes(String newNotes, RoomHistory historyService) {
+  void updateNotes(String newNotes) {
     notes = newNotes;
     updatedAt = DateTime.now();
-    historyService.createHistory(
+
+    RoomHistory.createHistory(
       roomId,
-      HistoryActionType.roomDeadlineChanged,
+      HistoryActionType.roomCardUpdated,
       "Notes updated: $newNotes",
     );
   }
