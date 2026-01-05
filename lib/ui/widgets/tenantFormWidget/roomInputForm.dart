@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/model/enum.dart';
-import 'package:myapp/ui/widgets/custom_dropdown.dart';
 import 'package:myapp/ui/widgets/custom_button.dart';
 import 'package:myapp/ui/widgets/custom_textfield.dart';
 

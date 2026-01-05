@@ -121,18 +121,5 @@ class _RoomCardState extends State<RoomCard> {
     );
   }
 
-  Widget _buildServiceChip(String service) {
-    IconData icon = Icons.wifi;
-    if (service.toLowerCase() == 'laundry') icon = Icons.local_laundry_service;
-    else if (service.toLowerCase().contains('elec')) icon = Icons.flash_on; 
-    else if (service.toLowerCase().contains('water')) icon = Icons.water_drop;
-
-    return Chip(
-      avatar: Icon(icon, size: 16, color: Colors.grey[600]),
-      label: Text(service, style: const TextStyle(fontSize: 11)),
-      backgroundColor: Colors.grey[100],
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    );
-  }
+  
 }
