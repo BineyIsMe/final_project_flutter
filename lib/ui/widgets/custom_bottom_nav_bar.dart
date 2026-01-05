@@ -17,6 +17,7 @@ class CustomBottomNavBar extends StatelessWidget {
       color: const Color(0xFF81B4A1),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _NavItem(
             index: 0,
@@ -66,23 +67,26 @@ class _NavItem extends StatelessWidget {
     final Color color =
         isSelected ? const Color(0xFF00FF44) : Colors.black;
 
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 32, color: color),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight:
-                  isSelected ? FontWeight.w600 : FontWeight.normal,
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onTap(index),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 32, color: color),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: color,
+                fontWeight:
+                    isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

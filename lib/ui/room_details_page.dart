@@ -6,7 +6,6 @@ import 'package:myapp/model/enum.dart';
 import 'package:myapp/model/RoomHistory.dart';
 import 'package:myapp/ui/widgets/roomdetailwidgets/ActionsCard.dart';
 import 'package:myapp/ui/widgets/roomdetailwidgets/ActiveServiceTile.dart';
-import 'package:myapp/ui/widgets/roomdetailwidgets/InputWrapper.dart';
 import 'package:myapp/ui/widgets/roomdetailwidgets/RentalInfoCard.dart';
 import 'package:myapp/ui/widgets/roomdetailwidgets/SectionHeader.dart';
 import 'package:myapp/ui/widgets/roomdetailwidgets/ServicesHeader.dart';
