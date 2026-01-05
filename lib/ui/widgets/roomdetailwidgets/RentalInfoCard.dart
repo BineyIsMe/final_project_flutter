@@ -8,6 +8,7 @@ class RentalInfoCard extends StatelessWidget {
   final PaymentPlan paymentPlan;
   final DateTime leaseStartDate;
   final DateTime leaseEndDate;
+  final DateTime nextPaymentDue;
 
   const RentalInfoCard({
     super.key,
@@ -15,6 +16,7 @@ class RentalInfoCard extends StatelessWidget {
     required this.paymentPlan,
     required this.leaseStartDate,
     required this.leaseEndDate,
+    required this.nextPaymentDue,
   });
 
   String _formatDate(DateTime date) => DateFormat('MMM dd, yyyy').format(date);
@@ -39,7 +41,7 @@ class RentalInfoCard extends StatelessWidget {
           const SizedBox(height: 8),
           InfoRow(
               label: 'Pay Plan: ${_formatPaymentPlan(paymentPlan)}',
-              value: 'Started ${_formatDate(leaseStartDate)}'),
+              value: 'Next Due ${_formatDate(nextPaymentDue)}'),
         ],
       ),
     );

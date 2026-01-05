@@ -15,6 +15,8 @@ class Tenant {
   final PaymentPlan paymentPlan;
   final DateTime leaseStartDate;
   final DateTime leaseEndDate;
+  final DateTime? lastPaymentDate;
+  final DateTime nextPaymentDue;
   final DateTime createdAt;
 
   Tenant({
@@ -27,13 +29,33 @@ class Tenant {
     required this.contractPlan,
     required this.paymentPlan,
     DateTime? leaseStartDate,
+    DateTime? leaseEndDate,
+    this.lastPaymentDate,
+    DateTime? nextPaymentDue,
     DateTime? createdAt,
-  }) : tenantId = tenantId ?? uuid.v4(),
-       leaseStartDate = leaseStartDate ?? DateTime.now(),
-       leaseEndDate = (leaseStartDate ?? DateTime.now()).add(
-         Duration(days: (contractPlan.durationInMonths * 30)),
-       ),
-       createdAt = createdAt ?? DateTime.now();
+  })  : tenantId = tenantId ?? uuid.v4(),
+        leaseStartDate = leaseStartDate ?? DateTime.now(),
+        createdAt = createdAt ?? DateTime.now(),
+        leaseEndDate = leaseEndDate ??
+            (leaseStartDate ?? DateTime.now())
+                .add(Duration(days: (contractPlan.durationInMonths * 30))),
+        nextPaymentDue = nextPaymentDue ??
+            _calculateInitialPaymentDue(
+                paymentPlan, leaseStartDate ?? DateTime.now());
+
+  static DateTime _calculateInitialPaymentDue(
+      PaymentPlan plan, DateTime startDate) {
+    switch (plan) {
+      case PaymentPlan.oneWeek:
+        return startDate.add(const Duration(days: 7));
+      case PaymentPlan.twoWeeks:
+        return startDate.add(const Duration(days: 14));
+      case PaymentPlan.oneMonth:
+        return startDate.add(const Duration(days: 30));
+      case PaymentPlan.threeMonths:
+        return startDate.add(const Duration(days: 90));
+    }
+  }
 
   void updateContact(String newPhone, String? newContactInfo) {
     phone = newPhone;
@@ -78,6 +100,7 @@ class Tenant {
       'paymentPlan': paymentPlan.name,
       'leaseStartDate': leaseStartDate.toIso8601String(),
       'leaseEndDate': leaseEndDate.toIso8601String(),
+      'lastPaymentDate': lastPaymentDate?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -118,6 +141,8 @@ class Tenant {
     PaymentPlan? paymentPlan,
     DateTime? leaseStartDate,
     DateTime? leaseEndDate,
+    DateTime? lastPaymentDate,
+    DateTime? nextPaymentDue,
     DateTime? createdAt,
   }) {
     return Tenant(
@@ -130,6 +155,9 @@ class Tenant {
       contractPlan: contractPlan ?? this.contractPlan,
       paymentPlan: paymentPlan ?? this.paymentPlan,
       leaseStartDate: leaseStartDate ?? this.leaseStartDate,
+      leaseEndDate: leaseEndDate ?? this.leaseEndDate,
+      lastPaymentDate: lastPaymentDate ?? this.lastPaymentDate,
+      nextPaymentDue: nextPaymentDue ?? this.nextPaymentDue,
       createdAt: createdAt ?? this.createdAt,
     );
   }

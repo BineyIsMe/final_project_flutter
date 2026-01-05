@@ -83,26 +83,40 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
         break;
     }
 
+    final newDate = currentRental.tenant.leaseEndDate.add(durationToAdd);
+    final paymentDate = DateTime.now();
+    final newNextPaymentDue = currentRental.tenant.nextPaymentDue.add(durationToAdd);
+    
     setState(() {
-      final newDate = currentRental.tenant.leaseEndDate.add(durationToAdd);
       final updatedTenant = currentRental.tenant.copyWith(
         leaseEndDate: newDate,
+        lastPaymentDate: paymentDate,
+        nextPaymentDue: newNextPaymentDue,
       );
 
       currentRental.updateTenantData(updatedTenant);
+
+  
+      final index = MockData.rentalServices.indexWhere(
+        (r) => r.rentalId == currentRental.rentalId,
+      );
+      if (index != -1) {
+        MockData.rentalServices[index] = currentRental;
+      }
 
       RoomHistory.createHistory(
         currentRental.room.roomId,
         HistoryActionType.paymentAdded,
         "Rent paid. Extended to ${_formatDate(newDate)}",
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Payment Added. New Due: ${_formatDate(newDate)}'),
-        ),
-      );
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Payment Added. Next Due: ${_formatDate(newNextPaymentDue)}'),
+        backgroundColor: const Color(0xFF81B4A1),
+      ),
+    );
   }
 
   void _handleRenewContract() {
@@ -132,27 +146,36 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
   }
 
   void _processRenewal() {
-    setState(() {
-      final int months = currentRental.tenant.contractPlan.durationInMonths;
-      final newEnd = currentRental.tenant.leaseEndDate.add(
-        Duration(days: months * 30),
-      );
+    final int months = currentRental.tenant.contractPlan.durationInMonths;
+    final newEnd = currentRental.tenant.leaseEndDate.add(
+      Duration(days: months * 30),
+    );
 
+    setState(() {
       final updatedTenant = currentRental.tenant.copyWith(leaseEndDate: newEnd);
       currentRental.updateTenantData(updatedTenant);
+
+    
+      final index = MockData.rentalServices.indexWhere(
+        (r) => r.rentalId == currentRental.rentalId,
+      );
+      if (index != -1) {
+        MockData.rentalServices[index] = currentRental;
+      }
 
       RoomHistory.createHistory(
         currentRental.room.roomId,
         HistoryActionType.roomDeadlineChanged,
         "Contract renewed ($months m). New End: ${_formatDate(newEnd)}",
       );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Contract Renewed. Ends: ${_formatDate(newEnd)}'),
-        ),
-      );
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Contract Renewed. Ends: ${_formatDate(newEnd)}'),
+        backgroundColor: Colors.blue,
+      ),
+    );
   }
 
   String _formatPaymentPlan(PaymentPlan plan) =>
@@ -197,10 +220,12 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
           }
           if (index == 1) {
             return RentalInfoCard(
+              key: ValueKey('${currentRental.tenant.leaseEndDate}_${currentRental.tenant.nextPaymentDue}'),
               contractPlan: currentRental.tenant.contractPlan,
               paymentPlan: currentRental.tenant.paymentPlan,
               leaseStartDate: currentRental.tenant.leaseStartDate,
               leaseEndDate: currentRental.tenant.leaseEndDate,
+              nextPaymentDue: currentRental.tenant.nextPaymentDue,
             );
           }
           if (index == 2) {
