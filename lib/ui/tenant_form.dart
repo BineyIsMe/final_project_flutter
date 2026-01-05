@@ -28,8 +28,6 @@ class _TenantFormState extends State<TenantForm> {
   final TextEditingController _rentFeeController = TextEditingController();
   final TextEditingController _roomNotesController = TextEditingController();
 
-  String? _selectedStatus;
-
   @override
   void dispose() {
     _tenantNameController.dispose();
@@ -42,13 +40,48 @@ class _TenantFormState extends State<TenantForm> {
     super.dispose();
   }
 
+  String? _validateTenantForm() {
+    if (_tenantNameController.text.trim().isEmpty) {
+      return 'Tenant name is required';
+    }
+    
+    if (_tenantNameController.text.trim().length < 2) {
+      return 'Tenant name must be at least 2 characters';
+    }
+
+    if (_contactInfoController.text.trim().isEmpty) {
+      return 'Contact info is required';
+    }
+
+
+    final digitsOnly = _contactInfoController.text.trim().replaceAll(RegExp(r'\D'), '');
+    if (digitsOnly.length < 9) {
+      return 'Phone number must have at least 9 digits';
+    }
+
+    
+    if (_emailController.text.trim().isNotEmpty) {
+      if (!_emailController.text.trim().contains('@')) {
+        return 'Email must contain @ symbol';
+      }
+    }
+
+    if (_selectedContractPlan == null) {
+      return 'Please select a contract plan';
+    }
+
+    if (_selectedPaymentPlan == null) {
+      return 'Please select a payment plan';
+    }
+
+    return null;
+  }
+
   void _handleSaveTenant() {
-    if (_tenantNameController.text.isEmpty ||
-        _contactInfoController.text.isEmpty ||
-        _selectedContractPlan == null ||
-        _selectedPaymentPlan == null) {
+    final validationError = _validateTenantForm();
+    if (validationError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
+        SnackBar(content: Text(validationError)),
       );
       return;
     }
@@ -63,9 +96,9 @@ class _TenantFormState extends State<TenantForm> {
 
       final newTenant = Tenant(
         roomId: null,
-        name: _tenantNameController.text,
-        phone: _contactInfoController.text,
-        contactInfo: _emailController.text,
+        name: _tenantNameController.text.trim(),
+        phone: _contactInfoController.text.trim(),
+        contactInfo: _emailController.text.trim(),
         contractPlan: contractPlan,
         paymentPlan: paymentPlan,
       );
@@ -88,31 +121,58 @@ class _TenantFormState extends State<TenantForm> {
     }
   }
 
+  String? _validateRoomForm() {
+    if (_roomNumberController.text.trim().isEmpty) {
+      return 'Room number is required';
+    }
+
+  
+    final existingRoom = MockData.rooms.where(
+      (r) => r.roomNumber.toLowerCase() == _roomNumberController.text.trim().toLowerCase(),
+    );
+    if (existingRoom.isNotEmpty) {
+      return 'Room number already exists';
+    }
+
+    if (_rentFeeController.text.trim().isEmpty) {
+      return 'Rent fee is required';
+    }
+
+
+    final rentFee = double.tryParse(_rentFeeController.text.trim());
+    if (rentFee == null) {
+      return 'Please enter a valid number for rent fee';
+    }
+
+    if (rentFee <= 0) {
+      return 'Rent fee must be greater than 0';
+    }
+
+    return null;
+  }
+
   void _handleSaveRoom() {
-    if (_roomNumberController.text.isEmpty ||
-        _rentFeeController.text.isEmpty ||
-        _selectedStatus == null) {
+    final validationError = _validateRoomForm();
+    if (validationError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
+        SnackBar(content: Text(validationError)),
       );
       return;
     }
 
     try {
-      double rentFee = double.parse(_rentFeeController.text);
+      double rentFee = double.parse(_rentFeeController.text.trim());
 
       final room = Room.create(
-        roomNumber: _roomNumberController.text,
+        roomNumber: _roomNumberController.text.trim(),
         rentFee: rentFee,
-        notes: _roomNotesController.text.isEmpty
+        notes: _roomNotesController.text.trim().isEmpty
             ? null
-            : _roomNotesController.text,
+            : _roomNotesController.text.trim(),
       );
 
-      Status status = Status.values.firstWhere(
-        (e) => e.name == _selectedStatus,
-      );
-      room.changeStatus(status);
+      // Automatically set status to available
+      room.changeStatus(Status.available);
 
       MockData.rooms.add(room);
       MockData().sync();
@@ -124,7 +184,7 @@ class _TenantFormState extends State<TenantForm> {
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid Rent Fee format')));
+      ).showSnackBar(SnackBar(content: Text('Error adding room: $e')));
     }
   }
 
@@ -232,8 +292,6 @@ class _TenantFormState extends State<TenantForm> {
                   roomNumberController: _roomNumberController,
                   rentFeeController: _rentFeeController,
                   notesController: _roomNotesController,
-                  selectedStatus: _selectedStatus,
-                  onStatusChanged: (v) => setState(() => _selectedStatus = v),
                   onSave: _handleSaveRoom,
                 ),
             ),

@@ -49,6 +49,7 @@ class RoomService {
       'serviceId': serviceId,
       'roomId': roomId,
       'serviceType': serviceType.name,
+      'status': status.name,
       'updatedAt': updatedAt.toIso8601String(),
       'timestamp': timestamp.toIso8601String(),
     };
@@ -61,6 +62,11 @@ class RoomService {
       serviceType: ServiceType.values.firstWhere(
         (e) => e.name == map['serviceType'],
       ),
+      status: map['status'] != null
+          ? ServiceStatus.values.firstWhere(
+              (e) => e.name == map['status'],
+            )
+          : null,
       updatedAt: DateTime.parse(map['updatedAt']),
       timestamp: DateTime.parse(map['timestamp']),
     );

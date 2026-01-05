@@ -22,9 +22,6 @@ class RoomDetailsPage extends StatefulWidget {
 }
 
 class _RoomDetailsPageState extends State<RoomDetailsPage> {
-  final TextEditingController _roomController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
-
   late RentalService currentRental;
 
   @override
@@ -36,28 +33,6 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
       );
     } catch (e) {
       currentRental = widget.rentalService;
-    }
-
-    _roomController.text = currentRental.room.roomNumber;
-    _notesController.text = currentRental.room.notes ?? '';
-  }
-
-  @override
-  void dispose() {
-    _roomController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
-
-  void _saveNotes() {
-    if (_notesController.text != (currentRental.room.notes ?? '')) {
-      setState(() {
-        currentRental.room.updateNotes(_notesController.text);
-      });
-      MockData().sync();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Notes updated successfully')),
-      );
     }
   }
 
@@ -213,12 +188,6 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save_outlined, color: Colors.black),
-            onPressed: _saveNotes,
-          ),
-        ],
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(20),
@@ -239,20 +208,58 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
             return const SectionHeader(title: 'Notes');
           }
           if (index == 3) {
-            return InputWrapper(
-              controller: _notesController,
-              hint: 'Notes',
-              maxLines: 4,
+            final notes = currentRental.room.notes;
+            if (notes == null || notes.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  'No notes available',
+                  style: TextStyle(color: Colors.grey[600], fontStyle: FontStyle.italic),
+                ),
+              );
+            }
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: Text(
+                notes,
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
             );
           }
           if (index == 4) {
             return const SectionHeader(title: 'Room Number');
           }
           if (index == 5) {
-            return InputWrapper(
-              controller: _roomController,
-              hint: 'E.g 110',
-              icon: Icons.meeting_room_outlined,
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.meeting_room_outlined,
+                    color: Colors.grey[600],
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    currentRental.room.roomNumber,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             );
           }
           if (index == 6) {

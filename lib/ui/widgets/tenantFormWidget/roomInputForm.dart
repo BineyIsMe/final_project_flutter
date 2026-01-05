@@ -8,9 +8,6 @@ class RoomInputForm extends StatelessWidget {
   final TextEditingController roomNumberController;
   final TextEditingController rentFeeController;
   final TextEditingController notesController;
-  
-  final String? selectedStatus;
-  final ValueChanged<String?> onStatusChanged;
   final VoidCallback onSave;
 
   const RoomInputForm({
@@ -18,8 +15,6 @@ class RoomInputForm extends StatelessWidget {
     required this.roomNumberController,
     required this.rentFeeController,
     required this.notesController,
-    required this.selectedStatus,
-    required this.onStatusChanged,
     required this.onSave,
   });
 
@@ -41,29 +36,6 @@ class RoomInputForm extends StatelessWidget {
           controller: roomNumberController,
           hint: 'E.g 101',
           icon: Icons.meeting_room_outlined,
-        ),
-
-        const SizedBox(height: 20),
-        const Text(
-          'Status',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        CustomDropdown(
-          value: selectedStatus,
-          hint: 'Status',
-          icon: Icons.info_outline,
-          items: Status.values.map((status) {
-            return DropdownMenuItem(
-              value: status.name,
-              child: Text(status.name),
-            );
-          }).toList(),
-          onChanged: onStatusChanged,
         ),
 
         const SizedBox(height: 20),

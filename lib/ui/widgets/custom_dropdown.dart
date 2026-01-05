@@ -38,19 +38,26 @@ class CustomDropdown extends StatelessWidget {
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 8,
+            horizontal: 12,
+            vertical: 16,
           ),
         ),
         items: items,
         onChanged: onChanged,
         icon: const Padding(
-          padding: EdgeInsets.only(right: 10),
+          padding: EdgeInsets.only(right: 12),
           child: Icon(
             Icons.keyboard_arrow_down,
             color: Colors.black,
+            size: 24,
           ),
         ),
+        isExpanded: true,
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+        ),
+        dropdownColor: Colors.white,
       ),
     );
   }
