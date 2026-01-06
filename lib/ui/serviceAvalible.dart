@@ -46,6 +46,7 @@ class _ServicesAvailablePageState extends State<ServicesAvailablePage> {
       backgroundColor: const Color(0xFF2D2D2D),
       appBar: AppBar(
         backgroundColor: Colors.white,
+        elevation: 0,
         title: const Text(
           'Manage Services',
           style: TextStyle(

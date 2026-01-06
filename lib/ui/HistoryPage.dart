@@ -7,29 +7,22 @@ import 'package:myapp/ui/widgets/buildHistoryItem.dart';
 import 'package:myapp/ui/widgets/buildSectionHeader.dart';
 import 'package:myapp/ui/widgets/custom_textfield.dart';
 import 'package:myapp/ui/widgets/filter_chip_button.dart';
-
-
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
-
   @override
   State<HistoryPage> createState() => _HistoryPageState();
 }
-
 class _HistoryPageState extends State<HistoryPage> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedFilter = 'All';
-
   final List<String> _filters = const ['All', 'Payment', 'Services', 'Rooms'];
   List<dynamic> _displayList = []; 
-
   @override
   void initState() {
     super.initState();
     _refreshData();
     _searchController.addListener(_refreshData);
   }
-
   @override
   void dispose() {
     _searchController.removeListener(_refreshData);
