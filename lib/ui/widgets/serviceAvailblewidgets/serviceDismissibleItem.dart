@@ -102,7 +102,8 @@ class ServiceDismissibleItem extends StatelessWidget {
               radius: 20,
               child: Icon(
                 _getServiceIcon(service),
-                color: _getServiceColor(service),
+                color: Colors.white,
+                
                 size: 20,
               ),
             ),
