@@ -49,7 +49,7 @@ class HistoryItemCard extends StatelessWidget {
         icon: icon,
         iconColor: iconColor,
         name: _formatActionTitle(item.actionType),
-        description: '${item.description} (Room ${item.roomId})',
+        description: '${item.description} (Room ${item.roomNum})',
         price: '', 
         dateTime: _formatTime(item.timestamp),
       ),

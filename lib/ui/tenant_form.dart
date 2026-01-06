@@ -171,7 +171,6 @@ class _TenantFormState extends State<TenantForm> {
             : _roomNotesController.text.trim(),
       );
 
-      // Automatically set status to available
       room.changeStatus(Status.available);
 
       MockData.rooms.add(room);

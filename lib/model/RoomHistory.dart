@@ -28,6 +28,14 @@ class RoomHistory {
       'timestamp': timestamp.toIso8601String(),
     };
   }
+String get roomNum {
+    try {
+      final room = MockData.rooms.firstWhere((r) => r.roomId == roomId);
+      return room.roomNumber;
+    } catch (e) {
+      return 'Unknown'; 
+    }
+  }
 
   factory RoomHistory.fromMap(Map<String, dynamic> map) {
     return RoomHistory(
@@ -70,10 +78,7 @@ static void createHistory(
       timestamp: DateTime.now(),
     );
     
-    // Add to list (in memory)
     MockData.historyLogs.add(newHistory);
-    
-    // NEW: Save to JSON File
     MockData().sync(); 
   }
 

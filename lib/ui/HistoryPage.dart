@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:myapp/data/mockData.dart';
 import 'package:myapp/model/RoomHistory.dart';
@@ -111,10 +112,6 @@ class _HistoryPageState extends State<HistoryPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: const Text(
           'History',
           style: TextStyle(

@@ -1,12 +1,10 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:myapp/data/mockData.dart';
 import 'package:myapp/ui/HistoryPage.dart';
 import 'package:myapp/ui/room_list.dart';
+import 'package:myapp/ui/serviceAvalible.dart';
 import 'package:myapp/ui/widgets/custom_bottom_nav_bar.dart';
-import 'package:path_provider/path_provider.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MockData().init();
@@ -16,23 +14,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  Future<void> debugPrintDatabase() async {
-    try {
-      final docsDir = await getApplicationDocumentsDirectory();
-      final file = File('${docsDir.path}/rental_app.json');
 
-      if (await file.exists()) {
-        String contents = await file.readAsString();
-        print("========= DATABASE CONTENT =========");
-        print(contents);
-        print("====================================");
-      } else {
-        print("File does not exist yet.");
-      }
-    } catch (e) {
-      print("Error reading file: $e");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +43,7 @@ class _MainLayoutState extends State<MainLayout> {
     _pages = const [
       RoomListPage(),
       HistoryPage(),
-      Center(child: Text("Dashboard")),
+      ServicesAvailablePage(),
     ];
   }
 
