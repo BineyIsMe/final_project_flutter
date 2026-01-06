@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:myapp/model/RentalService.dart';
 import 'package:myapp/model/enum.dart';
-import 'package:myapp/ui/widgets/room_card.dart'; 
+import 'package:intl/intl.dart';
+import 'package:myapp/ui/widgets/room_card.dart';
 
 class RoomRentalCard extends StatelessWidget {
   final RentalService item;
@@ -18,11 +18,16 @@ class RoomRentalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     Color statusColor = Colors.green;
     String? lateText;
-    final days = item.daysUntilExpiry; 
+    String? soonText;
+
+    final days = item.daysUntilExpiry;
 
     if (days < 0) {
       statusColor = Colors.red;
       lateText = 'Late ${days.abs()} Days';
+    } else if (days <= 7) { 
+      statusColor = Colors.orange;
+      soonText = 'Payment Due: $days Days';
     } else if (days <= 30) {
       statusColor = Colors.orange;
     }
@@ -41,9 +46,11 @@ class RoomRentalCard extends StatelessWidget {
           .toList(),
       statusColor: statusColor,
       lateWarning: lateText,
+      soonWarning: soonText,
       onViewDetail: onTap,
     );
   }
+
   String _formatDaysLeft(int days) {
     if (days < 0) return 'Expired';
     if (days == 0) return 'Due Today';
@@ -64,7 +71,6 @@ class RoomRentalCard extends StatelessWidget {
 
   String _formatDate(DateTime? date) {
     if (date == null) return 'N/A';
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${date.day} ${months[date.month - 1]} ${date.year}';
+    return DateFormat('dd MMM yyyy').format(date);
   }
 }

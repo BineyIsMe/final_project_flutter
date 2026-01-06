@@ -81,6 +81,9 @@ class _RoomDetailsPageState extends State<RoomDetailsPage> {
       case PaymentPlan.threeMonths:
         durationToAdd = const Duration(days: 90);
         break;
+        case PaymentPlan.oneday:
+        durationToAdd = const Duration(days: 1);
+        break;
     }
 
     final newDate = currentRental.tenant.leaseEndDate.add(durationToAdd);

@@ -54,6 +54,8 @@ class Tenant {
         return startDate.add(const Duration(days: 30));
       case PaymentPlan.threeMonths:
         return startDate.add(const Duration(days: 90));
+      case PaymentPlan.oneday:
+        return startDate.add(const Duration(days: 1));
     }
   }
 

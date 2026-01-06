@@ -17,22 +17,24 @@ enum ContractPlan {
   sixMonths(durationInMonths: 6),
   oneYear(durationInMonths: 12),
   oneAndHalfYears(durationInMonths: 18),
-  twoYears(durationInMonths: 24);
+  twoYears(durationInMonths: 24),
+  oneday(durationInDay: 1);
 
   final int durationInMonths;
+  final int durationInDay;
 
-  const ContractPlan({required this.durationInMonths});
+  const ContractPlan({ this.durationInMonths=0,this.durationInDay=0});
 
   DateTime getLeaseEndDate({required DateTime startDate}) {
     return DateTime(
       startDate.year,
       startDate.month + durationInMonths,
-      startDate.day,
+      startDate.day+durationInDay,
     );
   }
 }
 
-enum PaymentPlan { oneWeek, twoWeeks, oneMonth, threeMonths }
+enum PaymentPlan { oneWeek, twoWeeks, oneMonth, threeMonths,oneday }
 
 enum ServiceType {
   electricity(fee: 50.0, status: ServiceStatus.off),

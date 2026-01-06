@@ -12,6 +12,7 @@ class RoomCard extends StatefulWidget {
   final List<String> services;
   final Color statusColor;
   final String? lateWarning;
+  final String? soonWarning; 
   
   final VoidCallback? onViewDetail;
 
@@ -27,6 +28,7 @@ class RoomCard extends StatefulWidget {
     required this.services,
     required this.statusColor,
     this.lateWarning,
+    this.soonWarning, 
     this.onViewDetail,
   });
 
@@ -60,12 +62,19 @@ class _RoomCardState extends State<RoomCard> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (widget.lateWarning != null)
+                if (widget.lateWarning != null) ...[
                    Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(4)),
                     child: Text(widget.lateWarning!, style: const TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.w600)),
                    ),
+                ] else if (widget.soonWarning != null) ...[
+                   Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: Colors.orange[50], borderRadius: BorderRadius.circular(4)),
+                    child: Text(widget.soonWarning!, style: TextStyle(color: Colors.orange[800], fontSize: 10, fontWeight: FontWeight.w600)),
+                   ),
+                ],
                 const SizedBox(width: 8),
                 Container(
                   width: 12, height: 12,
@@ -120,6 +129,4 @@ class _RoomCardState extends State<RoomCard> {
       ),
     );
   }
-
-  
 }

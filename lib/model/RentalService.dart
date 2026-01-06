@@ -36,6 +36,9 @@ class RentalService {
   bool get isLate {
     return daysUntilExpiry < 0;
   }
+  bool get expireSoon{
+    return daysUntilExpiry < 1;
+  }
 
   void updateTenantData(Tenant updatedTenant) {
     tenant = updatedTenant;
