@@ -37,7 +37,7 @@ class CustomBottomNavBar extends StatelessWidget {
             index: 2,
             currentIndex: currentIndex,
             icon: Icons.dashboard_rounded,
-            label: 'Dashboard',
+            label: 'Services',
             onTap: onTap,
           ),
         ],

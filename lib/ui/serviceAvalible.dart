@@ -46,11 +46,6 @@ class _ServicesAvailablePageState extends State<ServicesAvailablePage> {
       backgroundColor: const Color(0xFF2D2D2D),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: const Text(
           'Manage Services',
           style: TextStyle(

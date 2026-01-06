@@ -16,6 +16,9 @@ class TenantForm extends StatefulWidget {
 class _TenantFormState extends State<TenantForm> {
   bool _isAddingTenant = true;
 
+  final _tenantFormKey = GlobalKey<FormState>();
+  final _roomFormKey = GlobalKey<FormState>();
+
   final TextEditingController _tenantNameController = TextEditingController();
   final TextEditingController _contactInfoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -78,11 +81,7 @@ class _TenantFormState extends State<TenantForm> {
   }
 
   void _handleSaveTenant() {
-    final validationError = _validateTenantForm();
-    if (validationError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(validationError)),
-      );
+    if (!_tenantFormKey.currentState!.validate()) {
       return;
     }
 
@@ -152,11 +151,7 @@ class _TenantFormState extends State<TenantForm> {
   }
 
   void _handleSaveRoom() {
-    final validationError = _validateRoomForm();
-    if (validationError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(validationError)),
-      );
+    if (!_roomFormKey.currentState!.validate()) {
       return;
     }
 
@@ -277,6 +272,7 @@ class _TenantFormState extends State<TenantForm> {
               color: Colors.white,
               child: _isAddingTenant 
               ? TenantInputForm(
+                  formKey: _tenantFormKey,
                   nameController: _tenantNameController,
                   contactController: _contactInfoController,
                   emailController: _emailController,
@@ -288,6 +284,7 @@ class _TenantFormState extends State<TenantForm> {
                   onSave: _handleSaveTenant,
                 ) 
               : RoomInputForm(
+                  formKey: _roomFormKey,
                   roomNumberController: _roomNumberController,
                   rentFeeController: _rentFeeController,
                   notesController: _roomNotesController,
